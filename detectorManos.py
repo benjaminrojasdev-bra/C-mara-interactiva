@@ -18,6 +18,14 @@ mpDibujar = mp.solutions.drawing_utils
 while True:
     success,img = dispositivo_Captura.read()
 
+    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    resultado = manos.process(imgRGB)
+
+    if resultado.multi_hand_landmarks:
+        for mano in resultado.multi_hand_landmarks:
+            mpDibujar.draw_landmarks(img, mano, mpManos.HAND_CONNECTIONS)
+    
+    #cambiar el color de la imagen a RGB
     cv2.imshow("image", img)
     cv2.waitKey(1)
 
