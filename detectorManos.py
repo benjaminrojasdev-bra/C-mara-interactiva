@@ -15,6 +15,19 @@ manos = mpManos.Hands(static_image_mode=False,
 #importar utilidades de dibujo
 mpDibujar = mp.solutions.drawing_utils
 
+foto1 = cv2.imread("gato.jpg")
+foto1 = cv2.resize(foto1, (200, 200))
+
+foto2 = cv2.imread("indice.jpg")
+foto2 = cv2.resize(foto2, (200, 200))
+
+foto3 = cv2.imread("pulgarArriba.jpg")
+foto3 = cv2.resize(foto3, (200, 200))
+
+foto4 = cv2.imread("puno.jpg")
+foto4 = cv2.resize(foto4, (200, 200))
+
+
 while True:
     success,img = dispositivo_Captura.read()
 
@@ -23,15 +36,39 @@ while True:
 
     if resultado.multi_hand_landmarks:
         for mano in resultado.multi_hand_landmarks:
-            #mpDibujar.draw_landmarks(img, mano, mpManos.HAND_CONNECTIONS)
-            for id, lm in enumerate(mano.landmark):
-                alto, ancho, color = img.shape
-                cx, cy = int(lm.x * ancho), int(lm.y * alto)
-                if  id == 4:
-                    cv2.circle(img, (cx,cy), 10, (255,0,255), cv2.FILLED)
-                if  id == 20:
-                    cv2.circle(img, (cx,cy), 10, (255,0,255), cv2.FILLED)
-                
+            mpDibujar.draw_landmarks(img, mano, mpManos.HAND_CONNECTIONS)
+            # aquí va la lógica de los dedos
+        
+        #if pulgar esta arriba
+        
+        
+        puntas = [8, 12, 16, 20] # pulgar, indice, medio anular, meñique
+        dedos = []
+        
+        if mano.landmark[4].y < mano.landmark[3].y and mano.landmark[4].y < mano.landmark[5].y:
+            dedos.append(1)
+        else:
+            dedos.append(0)
+        
+        for punta in puntas:
+            if mano.landmark[punta].y < mano.landmark[punta - 2].y:
+                dedos.append(1)
+            else:
+                dedos.append(0)
+
+        # aquí va el if que muestra la foto
+        if dedos == [0, 1, 1, 0, 0]:
+            img[0:200, 0:200] = foto1
+
+        if dedos == [0, 1, 0, 0, 0]:
+            img[0:200, 0:200] = foto2
+
+        if dedos == [1, 0, 0, 0, 0]:
+            img[0:200, 0:200] = foto3
+
+        if dedos == [0, 0, 0, 0, 0]:
+            img[0:200, 0:200] = foto4
+
     #cambiar el color de la imagen a RGB
     cv2.imshow("image", img)
     cv2.waitKey(1)
