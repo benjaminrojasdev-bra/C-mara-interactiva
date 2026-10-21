@@ -1,5 +1,5 @@
 import os
-
+import imageio
 import cv2
 import math
 import numpy as np
@@ -35,7 +35,11 @@ foto1 = cv2.resize(cv2.imread("Imagenes de prueba/gato.jpg"), (200, 200))
 foto2 = cv2.resize(cv2.imread("Imagenes de prueba/indice.jpg"), (200, 200))
 foto3 = cv2.resize(cv2.imread("Imagenes de prueba/pulgarArriba.jpg"), (200, 200))
 foto4 = cv2.resize(cv2.imread("Imagenes de prueba/puno.jpg"), (200, 200))
-foto5 = cv2.resize(cv2.imread("Imagenes de prueba/gojo.jpg"), (200, 200))
+
+frames_gojo = imageio.mimread("Imagenes de prueba/purpura.gif", memtest=False)
+frames_gojo = [cv2.resize(cv2.cvtColor(f[:, :, :3], cv2.COLOR_RGB2BGR), (300, 300)) for f in frames_gojo]
+indice_gif = 0
+
 
 if os.path.exists("muestras.npy"):
     muestras = list(np.load("muestras.npy"))
@@ -100,8 +104,9 @@ while True:
             if dedos == [0, 0, 0, 0, 0]:
                 img[0:200, 0:200] = foto4
 
-            if distancia(mano.landmark[4], mano.landmark[8]) < 0.2 and distancia(mano.landmark[4], mano.landmark[12]) < 0.2 and distancia(mano.landmark[8], mano.landmark[12]) < 0.2 and dedos[2] == 1 and dedos[3] == 1:
-                img[0:200, 0:200] = foto5
+            if distancia(mano.landmark[4], mano.landmark[8]) < 0.1 and distancia(mano.landmark[4], mano.landmark[12]) < 0.1 and distancia(mano.landmark[8], mano.landmark[12]) < 0.1 and dedos[2] == 1 and dedos[3] == 1:
+                img[0:300, 0:300] = frames_gojo[indice_gif]
+                indice_gif = (indice_gif + 1) % len(frames_gojo)
     
     cv2.putText(img, f"muestras: {len(muestras)}", (10, 30),
             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
